@@ -1,0 +1,39 @@
+{
+  "name": "Industrial Techno",
+  "description": "Distorted rumbling kicks, saturated dense mids, harsh metallic percussion, relentless and loud.",
+  "notes": [
+    "Distorted kick + rumble 30-100 Hz, saturation fills the mids.",
+    "Harsher 2-5 kHz than regular techno (metallic hits, noise).",
+    "Loud: around -7 LUFS; mono below 130 Hz."
+  ],
+  "source": "hand-tuned estimate from genre conventions (not measured from a track corpus)",
+  "mid_db": {
+    "31.5": -3.0,
+    "63": 0.0,
+    "125": -2.0,
+    "250": -7.0,
+    "500": -9.0,
+    "1000": -10.0,
+    "2000": -11.0,
+    "4000": -12.0,
+    "8000": -15.0,
+    "16000": -22.0
+  },
+  "side_db": {
+    "63": -40.0,
+    "125": -35.0,
+    "250": -18.0,
+    "500": -11.0,
+    "1000": -8.0,
+    "2000": -7.0,
+    "4000": -6.0,
+    "8000": -6.0,
+    "16000": -7.0
+  },
+  "master": {
+    "lufs": -7
+  },
+  "rules": {
+    "mono_below_hz": 130
+  }
+}

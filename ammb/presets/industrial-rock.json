@@ -1,0 +1,39 @@
+{
+  "name": "Industrial Rock",
+  "description": "Dense distorted guitars and synths in the mids, machine drums, aggressive but full.",
+  "notes": [
+    "NIN / Rammstein territory: the energy lives 125 Hz - 4 kHz (guitars, distorted synths).",
+    "Less sub than electronic genres; bass and kick tight around 60-120 Hz.",
+    "Around -8 LUFS; wide guitars, mono low end."
+  ],
+  "source": "hand-tuned estimate from genre conventions (not measured from a track corpus)",
+  "mid_db": {
+    "31.5": -14.0,
+    "63": -3.0,
+    "125": 0.0,
+    "250": -3.0,
+    "500": -5.0,
+    "1000": -7.0,
+    "2000": -9.0,
+    "4000": -11.0,
+    "8000": -15.0,
+    "16000": -23.0
+  },
+  "side_db": {
+    "63": -40.0,
+    "125": -25.0,
+    "250": -10.0,
+    "500": -5.0,
+    "1000": -4.0,
+    "2000": -4.0,
+    "4000": -5.0,
+    "8000": -6.0,
+    "16000": -8.0
+  },
+  "master": {
+    "lufs": -8
+  },
+  "rules": {
+    "mono_below_hz": 100
+  }
+}

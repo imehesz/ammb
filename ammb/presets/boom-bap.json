@@ -1,0 +1,39 @@
+{
+  "name": "Boom Bap",
+  "description": "Punchy sampled drums: thumping kick, cracking snare, warm dusty samples, upfront mono-ish vocals.",
+  "notes": [
+    "Kick thump 60-100 Hz, snare crack ~200 Hz body + 2 kHz snap.",
+    "Warm sample-based mids; highs a bit vintage, not glassy.",
+    "Fairly narrow image, around -9 LUFS."
+  ],
+  "source": "hand-tuned estimate from genre conventions (not measured from a track corpus)",
+  "mid_db": {
+    "31.5": -12.0,
+    "63": 0.0,
+    "125": 0.0,
+    "250": -5.0,
+    "500": -8.0,
+    "1000": -10.0,
+    "2000": -13.0,
+    "4000": -16.0,
+    "8000": -20.0,
+    "16000": -28.0
+  },
+  "side_db": {
+    "63": -40.0,
+    "125": -30.0,
+    "250": -16.0,
+    "500": -10.0,
+    "1000": -8.0,
+    "2000": -8.0,
+    "4000": -8.0,
+    "8000": -9.0,
+    "16000": -11.0
+  },
+  "master": {
+    "lufs": -9
+  },
+  "rules": {
+    "mono_below_hz": 120
+  }
+}

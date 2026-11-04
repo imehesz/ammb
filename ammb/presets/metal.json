@@ -1,0 +1,39 @@
+{
+  "name": "Metal (modern)",
+  "description": "Tight punchy low end, wall of wide double-tracked guitars, presence bump for bite, loud.",
+  "notes": [
+    "Tight kick/bass 60-120 Hz, no boomy sub.",
+    "Slight 500 Hz - 1 kHz dip, presence bump 2-4 kHz: the classic modern metal curve.",
+    "Very wide guitars (hard-panned doubles); loud: around -7.5 LUFS."
+  ],
+  "source": "hand-tuned estimate from genre conventions (not measured from a track corpus)",
+  "mid_db": {
+    "31.5": -16.0,
+    "63": -4.0,
+    "125": 0.0,
+    "250": -4.0,
+    "500": -7.0,
+    "1000": -8.0,
+    "2000": -7.0,
+    "4000": -8.0,
+    "8000": -12.0,
+    "16000": -21.0
+  },
+  "side_db": {
+    "63": -40.0,
+    "125": -35.0,
+    "250": -14.0,
+    "500": -5.0,
+    "1000": -3.0,
+    "2000": -3.0,
+    "4000": -3.0,
+    "8000": -4.0,
+    "16000": -6.0
+  },
+  "master": {
+    "lufs": -7.5
+  },
+  "rules": {
+    "mono_below_hz": 100
+  }
+}

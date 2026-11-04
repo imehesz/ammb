@@ -1,0 +1,39 @@
+{
+  "name": "Ambient Soundscapes",
+  "description": "Wide, airy and dynamic: little sub weight, broad smooth mids, open top, lots of room.",
+  "notes": [
+    "No kick to serve: less sub, energy spread evenly across the spectrum.",
+    "Very wide: reverbs and pads use the full stereo field (no forced mono low end).",
+    "Plenty of dynamics: around -16 LUFS."
+  ],
+  "source": "hand-tuned estimate from genre conventions (not measured from a track corpus)",
+  "mid_db": {
+    "31.5": -12.0,
+    "63": -4.0,
+    "125": -3.0,
+    "250": -5.0,
+    "500": -7.0,
+    "1000": -9.0,
+    "2000": -11.0,
+    "4000": -13.0,
+    "8000": -16.0,
+    "16000": -21.0
+  },
+  "side_db": {
+    "63": -20.0,
+    "125": -12.0,
+    "250": -6.0,
+    "500": -3.0,
+    "1000": -2.0,
+    "2000": -2.0,
+    "4000": -2.0,
+    "8000": -2.0,
+    "16000": -3.0
+  },
+  "master": {
+    "lufs": -16
+  },
+  "rules": {
+    "mono_below_hz": null
+  }
+}

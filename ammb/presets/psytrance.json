@@ -1,0 +1,41 @@
+{
+  "name": "Psytrance (full-on / progressive)",
+  "description": "Loud, bright, driving. Kick + rolling 16th bassline own 40-150 Hz, scooped low-mids, forward acid/lead presence, crisp wide top, rock-solid mono low end.",
+  "notes": [
+    "Kick ~45-60 Hz fundamental, bass rolls on the off-16ths around 60-150 Hz: the 63/125 octaves carry the energy, deep sub (31 Hz) less than dubstep/hip-hop.",
+    "Low-mids (250-500) scooped so the kick-bass 'KBBB' pattern stays clean and punchy.",
+    "Brighter than a typical dance master: acid squelches, screaming leads, sharp hats and FX up top.",
+    "Mono below ~120 Hz (club systems), very wide 1-16 kHz for the psychedelic FX.",
+    "Masters are LOUD: around -6 to -7 LUFS integrated."
+  ],
+  "mid_db": {
+    "31.5": -9.0,
+    "63": 0.0,
+    "125": -1.0,
+    "250": -8.0,
+    "500": -11.0,
+    "1000": -12.0,
+    "2000": -13.0,
+    "4000": -14.5,
+    "8000": -17.0,
+    "16000": -23.0
+  },
+  "side_db": {
+    "63": -40.0,
+    "125": -30.0,
+    "250": -14.0,
+    "500": -8.0,
+    "1000": -6.0,
+    "2000": -5.0,
+    "4000": -4.0,
+    "8000": -4.0,
+    "16000": -5.0
+  },
+  "master": {
+    "lufs": -6.5
+  },
+  "rules": {
+    "mono_below_hz": 120
+  },
+  "source": "hand-tuned estimate from genre conventions (not measured from a track corpus)"
+}

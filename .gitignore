@@ -1,0 +1,31 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Planning docs (kept local, not published)
+requirements/
+
+# Audio + generated output: never commit songs, stems or renders
+*.wav
+*.flac
+*.aif
+*.aiff
+*.ogg
+*.mp3
+*.wa_
+ammb_out/
+test_out/
+test_session/
+mixmaster/
+out*/
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

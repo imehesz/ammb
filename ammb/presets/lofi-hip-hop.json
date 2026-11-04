@@ -1,0 +1,39 @@
+{
+  "name": "Lo-fi Hip Hop",
+  "description": "Warm, soft and dusty: boosted low-mids, rolled-off highs like tape/vinyl, relaxed level.",
+  "notes": [
+    "The 'lo-fi' sound is mostly a dark top: highs roll off from ~8 kHz.",
+    "Warm low-mids (Rhodes, samples), soft kick, gentle drums.",
+    "Quiet and relaxed for a modern release: around -12 LUFS; fairly narrow."
+  ],
+  "source": "hand-tuned estimate from genre conventions (not measured from a track corpus)",
+  "mid_db": {
+    "31.5": -10.0,
+    "63": 0.0,
+    "125": 0.0,
+    "250": -6.0,
+    "500": -9.0,
+    "1000": -11.0,
+    "2000": -14.0,
+    "4000": -18.0,
+    "8000": -24.0,
+    "16000": -34.0
+  },
+  "side_db": {
+    "63": -40.0,
+    "125": -30.0,
+    "250": -14.0,
+    "500": -10.0,
+    "1000": -9.0,
+    "2000": -9.0,
+    "4000": -10.0,
+    "8000": -12.0,
+    "16000": -14.0
+  },
+  "master": {
+    "lufs": -12
+  },
+  "rules": {
+    "mono_below_hz": 100
+  }
+}

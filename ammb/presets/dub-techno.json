@@ -1,0 +1,39 @@
+{
+  "name": "Dub Techno",
+  "description": "Deep, dark and spacious: soft sub-kick, filtered chord stabs drowned in wide delays, rolled-off top.",
+  "notes": [
+    "Basic Channel / Chain Reaction lineage: deep and dark, top end deliberately dull.",
+    "The width comes from delays and reverb on the chords; keep the low end mono.",
+    "More dynamic than peak-time techno: around -10 LUFS."
+  ],
+  "source": "hand-tuned estimate from genre conventions (not measured from a track corpus)",
+  "mid_db": {
+    "31.5": -5.0,
+    "63": 0.0,
+    "125": -3.0,
+    "250": -9.0,
+    "500": -13.0,
+    "1000": -15.0,
+    "2000": -18.0,
+    "4000": -21.0,
+    "8000": -25.0,
+    "16000": -33.0
+  },
+  "side_db": {
+    "63": -40.0,
+    "125": -28.0,
+    "250": -12.0,
+    "500": -6.0,
+    "1000": -4.0,
+    "2000": -4.0,
+    "4000": -4.0,
+    "8000": -5.0,
+    "16000": -7.0
+  },
+  "master": {
+    "lufs": -10
+  },
+  "rules": {
+    "mono_below_hz": 100
+  }
+}

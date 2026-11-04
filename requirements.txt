@@ -1,0 +1,9 @@
+# Pinned to a set that installs on Python 3.10 - 3.12 (Windows / macOS / Linux)
+matchering==2.0.6
+numpy==2.2.6
+scipy==1.15.3
+soundfile==0.13.1
+numba==0.61.2
+resampy==0.4.3
+statsmodels==0.14.4
+pandas==2.2.3

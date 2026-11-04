@@ -1,0 +1,39 @@
+{
+  "name": "Trap",
+  "description": "Booming 808 sub, sparse mids, crisp rolling hi-hats, upfront vocals.",
+  "notes": [
+    "The 808 owns 30-60 Hz and is the loudest thing in the track.",
+    "Sparse mids around the vocal; crisp hats push 8-16 kHz.",
+    "Loud: around -7 LUFS; mono below 150 Hz."
+  ],
+  "source": "hand-tuned estimate from genre conventions (not measured from a track corpus)",
+  "mid_db": {
+    "31.5": 0.0,
+    "63": 0.0,
+    "125": -6.0,
+    "250": -13.0,
+    "500": -15.0,
+    "1000": -15.0,
+    "2000": -15.5,
+    "4000": -15.5,
+    "8000": -16.5,
+    "16000": -21.0
+  },
+  "side_db": {
+    "63": -40.0,
+    "125": -40.0,
+    "250": -30.0,
+    "500": -14.0,
+    "1000": -8.0,
+    "2000": -6.0,
+    "4000": -5.0,
+    "8000": -4.0,
+    "16000": -5.0
+  },
+  "master": {
+    "lufs": -7
+  },
+  "rules": {
+    "mono_below_hz": 150
+  }
+}

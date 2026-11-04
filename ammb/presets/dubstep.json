@@ -1,0 +1,39 @@
+{
+  "name": "Dubstep",
+  "description": "Massive sub, aggressive wobbly mid-bass, bright snares, very loud.",
+  "notes": [
+    "Sub 40-60 Hz is enormous; wobble/growl basses fill 200 Hz - 4 kHz.",
+    "Bright snares and top; half-time groove leaves room for the bass.",
+    "Very loud: around -5.5 LUFS; mono below 150 Hz."
+  ],
+  "source": "hand-tuned estimate from genre conventions (not measured from a track corpus)",
+  "mid_db": {
+    "31.5": -1.0,
+    "63": 0.0,
+    "125": -4.0,
+    "250": -9.0,
+    "500": -11.0,
+    "1000": -11.0,
+    "2000": -12.0,
+    "4000": -13.5,
+    "8000": -16.0,
+    "16000": -22.0
+  },
+  "side_db": {
+    "63": -40.0,
+    "125": -40.0,
+    "250": -30.0,
+    "500": -14.0,
+    "1000": -6.0,
+    "2000": -4.0,
+    "4000": -4.0,
+    "8000": -4.0,
+    "16000": -5.0
+  },
+  "master": {
+    "lufs": -5.5
+  },
+  "rules": {
+    "mono_below_hz": 150
+  }
+}

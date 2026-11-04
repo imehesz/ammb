@@ -1,0 +1,28 @@
+[project]
+name = "ammb"
+version = "0.1.0"
+description = "Audacity Auto-Mix & Master Bridge (AMMB by M3HX)"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "matchering==2.0.6",
+    "numpy==2.2.6",
+    "scipy==1.15.3",
+    "soundfile==0.13.1",
+    "numba==0.61.2",
+    "resampy==0.4.3",
+    "statsmodels==0.14.4",
+    "pandas==2.2.3",
+]
+
+[project.scripts]
+ammb = "ammb.cli:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["ammb"]
+
+[tool.setuptools.package-data]
+ammb = ["presets/*.json"]

@@ -1,0 +1,39 @@
+{
+  "name": "Drum and Bass",
+  "description": "Huge sub-bass, fast bright breaks, energetic and loud.",
+  "notes": [
+    "Sub bass 40-60 Hz carries the weight; Reese/mid-bass fills 100-500 Hz.",
+    "Breaks and hats are bright: lots of 4-10 kHz.",
+    "Loud: around -6.5 LUFS; mono below 150 Hz."
+  ],
+  "source": "hand-tuned estimate from genre conventions (not measured from a track corpus)",
+  "mid_db": {
+    "31.5": -2.0,
+    "63": 0.0,
+    "125": -4.0,
+    "250": -10.0,
+    "500": -12.0,
+    "1000": -13.0,
+    "2000": -14.5,
+    "4000": -15.5,
+    "8000": -17.5,
+    "16000": -23.0
+  },
+  "side_db": {
+    "63": -40.0,
+    "125": -40.0,
+    "250": -25.0,
+    "500": -12.0,
+    "1000": -7.0,
+    "2000": -5.0,
+    "4000": -4.0,
+    "8000": -4.0,
+    "16000": -5.0
+  },
+  "master": {
+    "lufs": -6.5
+  },
+  "rules": {
+    "mono_below_hz": 150
+  }
+}

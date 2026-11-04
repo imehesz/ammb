@@ -1,0 +1,39 @@
+{
+  "name": "Synthwave",
+  "description": "Warm analog synths, gated snares, lush wide chorus and reverb, smooth top.",
+  "notes": [
+    "80s-inspired: warm low-mids, punchy but round low end.",
+    "Wide chorus/reverb on pads and leads; top smooth rather than sizzling.",
+    "Around -9 LUFS."
+  ],
+  "source": "hand-tuned estimate from genre conventions (not measured from a track corpus)",
+  "mid_db": {
+    "31.5": -10.0,
+    "63": 0.0,
+    "125": -1.0,
+    "250": -5.0,
+    "500": -8.0,
+    "1000": -10.0,
+    "2000": -12.0,
+    "4000": -14.0,
+    "8000": -17.0,
+    "16000": -25.0
+  },
+  "side_db": {
+    "63": -40.0,
+    "125": -30.0,
+    "250": -14.0,
+    "500": -6.0,
+    "1000": -4.0,
+    "2000": -3.0,
+    "4000": -3.0,
+    "8000": -4.0,
+    "16000": -6.0
+  },
+  "master": {
+    "lufs": -9
+  },
+  "rules": {
+    "mono_below_hz": 120
+  }
+}
