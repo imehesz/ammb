@@ -1,6 +1,7 @@
 """Command line entry point.
 
-    ammb offline --stems <folder> --ref <ref.wav> [--out <folder>] [options]
+    ammb offline  --stems <folder> (--ref <ref.wav> | --preset <name>) [options]
+    ammb audacity [--preset <name>] [--check] [options]
 """
 
 from __future__ import annotations
@@ -61,12 +62,7 @@ def cmd_offline(a) -> int:
     if a.preset:
         import soundfile as sf
         from . import presets
-        preset = presets.load(a.preset)
-        out.mkdir(parents=True, exist_ok=True)
-        sr = sf.info(str(stems[0])).samplerate
-        print(f"Preset: {preset['name']}  (target {preset.get('master', {}).get('lufs', -9)} LUFS)")
-        ref = presets.make_reference(preset, out / f"preset_reference_{preset['id']}.wav", sr)
-        opts.mono_below_hz = preset.get("rules", {}).get("mono_below_hz")
+        ref = presets.prepare(a.preset, out, sf.info(str(stems[0])).samplerate, opts)
     rep = pipeline.run(stems, ref, out, opts)
     print(pipeline.format_report(rep))
     print(f"  Output folder: {out.resolve()}")
@@ -76,7 +72,15 @@ def cmd_offline(a) -> int:
 
 def cmd_audacity(a) -> int:
     from . import bridge
-    return bridge.run(_opts(a), Path(a.out) if a.out else None, apply_gains=a.apply_gains)
+    if a.preset:
+        from . import presets
+        try:
+            presets.load(a.preset)
+        except FileNotFoundError as e:
+            print(e)
+            return 2
+    return bridge.run(_opts(a), Path(a.out) if a.out else None, apply_gains=a.apply_gains,
+                      preset=a.preset, check_only=a.check)
 
 
 def main(argv=None) -> int:
@@ -93,6 +97,9 @@ def main(argv=None) -> int:
     off.set_defaults(func=cmd_offline)
 
     au = sub.add_parser("audacity", help="run on the open Audacity 3 session (mod-script-pipe)")
+    au.add_argument("--preset", help="genre preset as the target (a REF track is then not needed)")
+    au.add_argument("--check", action="store_true",
+                    help="connect, show what would be exported/ignored, change nothing")
     au.add_argument("--out", help="keep working files + report here (default: temp folder, deleted)")
     au.add_argument("--apply-gains", action="store_true",
                     help="also write the solved gains onto the stem tracks' gain sliders")

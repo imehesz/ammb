@@ -28,25 +28,49 @@ def _is_ref(t):
     return t["name"].strip().lower() == "ref"
 
 
-def _classify(tracks):
-    ref, stems = None, []
+def _classify(tracks, need_ref: bool = True):
+    """-> (ref index or None, stem indices, {index: why it is ignored})"""
+    ref, stems, ignored = None, [], {}
     for i, t in enumerate(tracks):
+        name = t.get("name", "").strip()
         if t.get("kind") != "wave":
+            ignored[i] = f"{t.get('kind', '?')} track"
             continue
-        name = t["name"].strip()
         if _is_ref(t):
             if ref is not None:
                 raise PipeError("More than one track is named REF - keep exactly one.")
             ref = i
-        elif name.upper().startswith(OUT_PREFIX) or name.startswith("#"):
-            continue
+        elif name.upper().startswith(OUT_PREFIX):
+            ignored[i] = "earlier AMMB output"
+        elif name.startswith("#"):
+            ignored[i] = "name starts with #"
         else:
             stems.append(i)
-    if ref is None:
-        raise PipeError("No track named 'REF' found. Import your reference song and rename its track to REF.")
+    if ref is None and need_ref:
+        raise PipeError("No track named 'REF' found. Import your reference song and rename its "
+                        "track to REF, or use a genre preset (--preset techno).")
     if not stems:
-        raise PipeError("Found REF but no stem tracks.")
-    return ref, stems
+        raise PipeError("No stem tracks found.")
+    return ref, stems, ignored
+
+
+def _print_plan(tracks, ref_i, stem_is, ignored, preset, end):
+    print(f"Connected to Audacity: {len(tracks)} tracks, project length {end:.1f} s\n")
+    for i, t in enumerate(tracks):
+        if i in stem_is:
+            role = "STEM"
+        elif i == ref_i:
+            role = "REF (ignored: using preset)" if preset else "REF"
+        else:
+            role = f"skip ({ignored.get(i, '')})"
+        extra = ""
+        if t.get("kind") == "wave":
+            extra = f"  {t.get('start', 0):6.2f}-{t.get('end', 0):6.2f} s  gain {t.get('gain', 0):+.1f} dB"
+            if t.get("mute"):
+                extra += "  (muted - still exported)"
+        print(f"  {i + 1:2d}. {t.get('name', ''):<24} {role:<28}{extra}")
+    target = f"preset '{preset}'" if preset else "the REF track"
+    print(f"\n  {len(stem_is)} stems will be exported and mastered against {target}.")
 
 
 def _set_audio(pipe, index, **kw):
@@ -78,12 +102,28 @@ def _align(path, track_start, project_end):
     return False
 
 
-def run(opts: pipeline.Options, out_dir: Path | None = None, apply_gains: bool = False) -> int:
+def run(opts: pipeline.Options, out_dir: Path | None = None, apply_gains: bool = False,
+        preset: str | None = None, check_only: bool = False) -> int:
     try:
         pipe = AudacityPipe()
     except PipeError as e:
         print(e)
         return 3
+
+    if check_only:
+        try:
+            tracks = pipe.tracks()
+            waves = [t for t in tracks if t.get("kind") == "wave"]
+            end = max((t["end"] for t in waves), default=0.0)
+            ref_i, stem_is, ignored = _classify(tracks, need_ref=not preset)
+            _print_plan(tracks, ref_i, stem_is, ignored, preset, end)
+            print("  --check: nothing was changed.")
+            return 0
+        except PipeError as e:
+            print(f"\nERROR: {e}")
+            return 4
+        finally:
+            pipe.close()
 
     work = Path(out_dir) if out_dir else Path(tempfile.mkdtemp(prefix="ammb_"))
     keep = out_dir is not None
@@ -93,12 +133,14 @@ def run(opts: pipeline.Options, out_dir: Path | None = None, apply_gains: bool =
     saved = {i: (t.get("mute", 0), t.get("solo", 0)) for i, t in enumerate(tracks) if t.get("kind") == "wave"}
 
     try:
-        ref_i, stem_is = _classify(tracks)
+        ref_i, stem_is, ignored = _classify(tracks, need_ref=not preset)
         end = max(t["end"] for t in tracks if t.get("kind") == "wave")
-        print(f"Session: {len(stem_is)} stems, REF = track {ref_i + 1}, {end:.1f} s")
+        _print_plan(tracks, ref_i, stem_is, ignored, preset, end)
+        print()
 
+        export_is = stem_is + ([] if preset or ref_i is None else [ref_i])
         files, low_bit = {}, []
-        for i in stem_is + [ref_i]:
+        for i in export_is:
             t = tracks[i]
             path = exp / (f"ref.wav" if i == ref_i else f"stem_{i:02d}.wav")
             print(f"  exporting '{t['name']}' ...")
@@ -118,7 +160,12 @@ def run(opts: pipeline.Options, out_dir: Path | None = None, apply_gains: bool =
         for i, (m, s) in saved.items():
             _set_audio(pipe, i, Mute=int(bool(m)), Solo=int(bool(s)))
 
-        rep = pipeline.run([files[i] for i in stem_is], files[ref_i], work, opts,
+        if preset:
+            from . import presets
+            ref_file = presets.prepare(preset, work, sf.info(str(files[stem_is[0]])).samplerate, opts)
+        else:
+            ref_file = files[ref_i]
+        rep = pipeline.run([files[i] for i in stem_is], ref_file, work, opts,
                            stem_names=[tracks[i]["name"] for i in stem_is])
         print(pipeline.format_report(rep))
 
@@ -147,10 +194,13 @@ def run(opts: pipeline.Options, out_dir: Path | None = None, apply_gains: bool =
                 _set_audio(pipe, i, Gain=f"{max(-36.0, min(36.0, old + s['gain_db'])):.2f}")
             print("  Solved gains written to the stem faders.")
 
-        for i in stem_is + [ref_i]:
+        for i in stem_is + ([ref_i] if ref_i is not None else []):
             _set_audio(pipe, i, Mute=1)
         pipe.send("SelectNone:")
-        print("  Imported FINAL_MASTER. Stems + REF muted; solo REF vs FINAL_MASTER to A/B.")
+        if ref_i is not None:
+            print("  Imported FINAL_MASTER. Stems + REF muted; solo REF vs FINAL_MASTER to A/B.")
+        else:
+            print("  Imported FINAL_MASTER. Stems muted.")
         if opts.compare:
             print("  FINAL_MASTER_UNITY (your mix untouched, same mastering) is imported muted.")
         return 0

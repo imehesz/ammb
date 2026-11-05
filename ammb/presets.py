@@ -76,6 +76,16 @@ def make_reference(preset: dict, path: str | Path, sr: int, seconds: float = 30.
     return Path(path)
 
 
+def prepare(name_or_path: str, out_dir: str | Path, sr: int, opts) -> Path:
+    """Load a preset, write its synthetic reference into out_dir, apply its rules to opts."""
+    preset = load(name_or_path)
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    print(f"Preset: {preset['name']}  (target {preset.get('master', {}).get('lufs', -9)} LUFS)")
+    opts.mono_below_hz = preset.get("rules", {}).get("mono_below_hz")
+    return make_reference(preset, out_dir / f"preset_reference_{preset['id']}.wav", sr)
+
+
 def mono_below(x: np.ndarray, sr: int, hz: float) -> np.ndarray:
     """Remove side-channel content below `hz` (zero-phase), i.e. a mono low end."""
     from scipy.signal import butter, sosfiltfilt
