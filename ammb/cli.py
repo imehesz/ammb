@@ -106,6 +106,9 @@ def main(argv=None) -> int:
     _add_dsp_args(au)
     au.set_defaults(func=cmd_audacity)
 
+    g = sub.add_parser("gui", help="open the companion window")
+    g.set_defaults(func=lambda a: __import__("ammb.gui", fromlist=["main"]).main())
+
     a = ap.parse_args(argv)
     return a.func(a)
 

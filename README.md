@@ -3,7 +3,10 @@
 Masters a multitrack song from your stems. The target is either a **genre preset**
 (15 included) or a **reference track** you supply. The mastering is done with
 [Matchering](https://github.com/sergree/matchering), and the whole pipeline is plain DSP,
-with no machine learning.
+with no machine learning. AMMB works straight from an open **Audacity** session, or on a
+folder of stems from any DAW.
+
+![The AMMB window next to Audacity, with the spectrum comparison of a stem mix against the Psytrance preset](docs/screenshot.png)
 
 ```
 stems ─► sum (your levels, or auto-balanced) ─► -6 dBTP pre-master ─► Matchering ─► final master
@@ -11,8 +14,8 @@ stems ─► sum (your levels, or auto-balanced) ─► -6 dBTP pre-master ─�
                                          genre preset (synthetic reference)  or  REF track
 ```
 
-* **Preset:** you know the genre and want a dependable target (`--preset techno`).
-* **REF track:** you want the sound of one specific song (`--ref song.wav`).
+* **Preset:** you know the genre and want a dependable target.
+* **REF track:** you want the sound of one specific song.
 
 ## Install
 
@@ -20,36 +23,73 @@ Needs Python 3.10 – 3.12.
 
 **Windows (PowerShell):**
 ```powershell
-cd C:\path\to\ammb-m3hx
+git clone https://github.com/imehesz/ammb
+cd ammb
 py -3.10 -m venv .venv          # or any 3.10-3.12 python
 .venv\Scripts\activate
 pip install -r requirements.txt
-pip install -e .                # adds the `ammb` command
+pip install -e .                # adds the `ammb` and `ammb-gui` commands
 ```
 
 **macOS / Linux** (with [uv](https://docs.astral.sh/uv/)):
 ```bash
+git clone https://github.com/imehesz/ammb && cd ammb
 uv sync
-uv run ammb --help
+uv run ammb gui
 ```
 
-## Quick start
+## The AMMB window
 
-Put your stems in one folder, all starting at the same point in time (Audacity's
-**File > Export > Export Multiple** does this). File names don't matter. Every
-`.wav/.flac/.aif/.ogg` file in the folder counts as a stem. Files named `REF.*` are skipped.
+On Windows, **double-click `AMMB.bat`**. Elsewhere, run `ammb gui` (or `ammb-gui`).
+
+* **Audacity tab:** connects to the open Audacity session and lists its tracks with their roles.
+  Choose a target and press **MASTER IT**. A **FINAL_MASTER** track appears in your session,
+  and the stems are muted so you can A/B right away.
+* **Stems folder tab:** pick a folder of stems, a target and an output folder. You get
+  `final_master.wav` and a report. Works with stems from any DAW.
+* **Compare spectrum:** before you master, draws your stem mix against the target in 1/3-octave
+  bands (red = more than the target, green = less) and lists the biggest gaps in plain words.
+  Big gaps are usually best fixed in the mix itself, e.g. a stem's level or EQ.
+* **Settings → Dark mode**, which is remembered between sessions. **About** has a short how-to.
+
+### Audacity setup (one time)
+
+> Needs **Audacity 3.2+**. Audacity 4.0 has no scripting pipe yet (`mod-script-pipe` isn't in 4.0.2).
+> Audacity 3 and 4 can be installed side by side.
+
+1. **Edit > Preferences > Modules**: set **mod-script-pipe** to **Enabled**, then restart Audacity.
+2. Do one manual **File > Export > Export Audio…** as WAV with encoding **32-bit float**.
+   Scripted exports reuse the last WAV settings.
+3. Session rules:
+   * every audio track is a stem
+   * a track named `REF` is the reference (only needed when you master against a REF instead of a preset)
+   * a track whose name starts with `#` is left out
+   * your gain sliders, pan and effects are part of the export
+   * re-runs ignore earlier `FINAL_MASTER*` tracks
+
+## Command line
+
+The window is a front end to the same commands, which you can also run directly:
 
 ```bash
-# master with a genre preset, keeping your own levels
+# a folder of stems, mastered with a genre preset, keeping your own levels
 ammb offline --stems song/stems --preset psytrance --no-balance --out song/out_psy
 
-# master against a reference song instead
+# ... or against a reference song
 ammb offline --stems song/stems --ref song/ref.wav --no-balance --out song/out_ref
+
+# the open Audacity session
+ammb audacity --check                                # show what would happen, change nothing
+ammb audacity --preset techno --no-balance           # master, import FINAL_MASTER
 
 ammb offline --list-presets
 ```
 
-Output folder:
+In a stems folder, every `.wav/.flac/.aif/.ogg` file counts as a stem. File names don't matter,
+and files named `REF.*` are skipped. All stems should start at the same point in time; Audacity's
+**File > Export > Export Multiple** does this.
+
+The output folder gets:
 
 * `final_master.wav`: the master (24-bit)
 * `premaster.wav`: the summed stems at −6 dBTP, 32-bit float
@@ -84,28 +124,31 @@ Each preset is a JSON file in `ammb/presets/` with these fields:
 * `rules.mono_below_hz`: makes the pre-master's low end mono below this frequency (`null` = off)
 
 Matchering only "hears" a reference's average mid/side spectrum and its loudness. So a
-preset is turned into stationary noise with exactly that shape and level, and
-Matchering is pointed at it.
+preset is turned into stationary noise with exactly that shape and level (rolling off below
+~25 Hz, like real music), and Matchering is pointed at it.
 
 To make your own preset, copy a JSON file, edit the numbers, and pass its path:
-`--preset my_presets/dark-techno.json`.
+`--preset my_presets/dark-techno.json`. Files you drop into `ammb/presets/` also show up in
+the window's dropdown.
 
 > The bundled curves are **hand-tuned estimates** from genre conventions. They are not
 > measured averages of real tracks, so trust your ears over them. Planned: `ammb preset build
 > <name> <folder of tracks>`, which averages real tracks into a preset.
 
-## Auto-balancing (optional)
+## Auto-balancing (experimental)
 
-Leave out `--no-balance` and the tool also sets each stem's gain to match the target's
-spectrum, before summing.
+Tick **Auto-balance** in the window, or leave out `--no-balance`, and AMMB also sets each stem's
+gain to match the target's spectrum before summing.
 
-* `--compare` also renders `final_master_unity.wav`, which uses your original levels, for A/B.
+* `--compare` (in the window: "Also make a version with my original levels") also renders a master
+  that uses your original levels, for A/B.
 * `--ignore-tilt` leaves broad darker/brighter differences to Matchering. The faders then only fix
-  bumps caused by one stem being too loud or too quiet. This option makes much gentler moves.
+  bumps caused by one stem being too loud or too quiet, so this option makes much gentler moves.
+* In Audacity mode, `--apply-gains` writes the solved gains onto the stems' gain sliders.
 
 **Status:** in the first listening test, your own levels plus mastering beat both balanced
 versions. A spectrum can't tell which of two stems in the same range should be on top, e.g.
-a vocal vs. a pad. Treat balancing as experimental. Role-based loudness targets are the likely fix.
+a vocal vs. a pad. Role-based loudness targets are the likely fix.
 
 How it works: for each band *k*, the cross-power matrix `C_k` of all stems is computed once.
 The band energy of any mix with gains `g` is then exactly `gᵀ C_k g`, which accounts for overlap
@@ -121,7 +164,7 @@ and phase. The solver minimizes, in dB:
 
 | flag | default | meaning |
 |---|---|---|
-| `--preset` / `--ref` | | The target: a preset name or JSON path, or a reference song. Give exactly one. |
+| `--preset` / `--ref` | | The target: a preset name or JSON path, or a reference song. Offline mode needs exactly one; Audacity mode uses the `REF` track when no preset is given. |
 | `--no-balance` | | Keep your stem levels; only sum and master. |
 | `--compare` | | Also render the unity-level master for A/B. |
 | `--ignore-tilt` | | Gentler balancing (see above). |
@@ -130,38 +173,27 @@ and phase. The solver minimizes, in dB:
 | `--min-db` / `--max-db` | `-20` / `+9.5` | Most a stem may move when balancing. |
 | `--headroom` | `-6` | Pre-master true peak (dBTP). |
 | `--no-master` | | Stop after `premaster.wav`. |
-
-## Audacity mode (Audacity 3, experimental)
-
-> **Audacity 4 has no scripting pipe yet** (`mod-script-pipe` isn't in 4.0.2). Use Audacity 3.2+,
-> which can be installed next to 4. This mode has only been tested against a simulated pipe,
-> not a real Audacity, and it currently needs a `REF` track. Presets are offline-only for now.
-
-1. **Edit > Preferences > Modules**: set **mod-script-pipe** to **Enabled**, then restart Audacity.
-2. Do one manual **File > Export > Export Audio…** as WAV with encoding **32-bit float**.
-   Scripted exports reuse the last WAV settings.
-3. Name the reference track `REF`. Every other audio track is a stem. To leave a track out,
-   start its name with `#`. Your gain, pan and effects are part of the export.
-4. With Audacity open: `python audacity_bridge.py --compare` (options as above, plus
-   `--apply-gains` to write solved gains onto the gain sliders, and `--out <folder>` to keep the files).
-
-The tool imports **FINAL_MASTER** (plus a muted **FINAL_MASTER_UNITY** with `--compare`) and
-mutes the stems and REF. Re-runs ignore `FINAL_MASTER*` tracks.
+| `--check` | | Audacity mode only: show the plan, change nothing. |
+| `--apply-gains` | | Audacity mode only: write solved gains onto the gain sliders. |
+| `--out` | | Audacity mode: keep the exported stems + report in this folder. |
 
 ## Development
 
 ```
 ammb/
-  cli.py          command line (offline / audacity)
+  gui.py          the AMMB window (Tkinter, no extra dependencies)
+  cli.py          command line (offline / audacity / gui)
   pipeline.py     load -> analyse -> balance -> sum -> master, report
   analysis.py     cross-spectral band power, BS.1770 loudness
   balancer.py     gain solver, mixdown, true-peak normalise
+  spectrum.py     1/3-octave curves + plain-language differences for Compare spectrum
   presets.py      preset loading, synthetic reference, mono low end
   presets/*.json  genre presets
   master.py       Matchering wrapper
   pipe.py         Audacity 3 mod-script-pipe client
   bridge.py       Audacity session -> pipeline -> re-import
-audacity_bridge.py        one-command Audacity entry point
+AMMB.bat                   Windows double-click launcher (uses .venv)
+audacity_bridge.py         same as `ammb audacity`
 tools/make_test_session.py synthetic stems with a known answer
 ```
 

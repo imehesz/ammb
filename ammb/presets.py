@@ -48,7 +48,7 @@ def _shaped_noise(octave_db: dict, n: int, sr: int, rng) -> np.ndarray:
     f = np.fft.rfftfreq(n, 1.0 / sr)
     # octave-band power P -> power density per Hz ~ P / f  (an octave at f is ~0.7 f wide)
     dens = 10 ** (_curve(octave_db, f) / 10) / np.maximum(f, 1.0)
-    dens *= 1.0 / (1 + (18.0 / np.maximum(f, 1e-3)) ** 8)        # steep rumble cut below ~18 Hz
+    dens *= 1.0 / (1 + (25.0 / np.maximum(f, 1e-3)) ** 6)        # natural roll-off below ~25 Hz (no subsonic boost)
     dens *= 1.0 / (1 + (f / 20500.0) ** 16)                       # and above 20.5 kHz
     spec = (rng.standard_normal(len(f)) + 1j * rng.standard_normal(len(f))) * np.sqrt(dens)
     spec[0] = 0

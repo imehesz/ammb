@@ -102,6 +102,70 @@ def _align(path, track_start, project_end):
     return False
 
 
+def inspect() -> dict:
+    """Read the session without changing anything. For the GUI.
+
+    -> {"tracks": [...], "roles": [str per track], "stems": int, "has_ref": bool, "end": float}
+    Raises PipeError if Audacity can't be reached.
+    """
+    pipe = AudacityPipe(timeout=2.0)
+    try:
+        tracks = pipe.tracks()
+    finally:
+        pipe.close()
+    ref_i, stem_is, ignored = None, [], {}
+    try:
+        ref_i, stem_is, ignored = _classify(tracks, need_ref=False)
+    except PipeError:
+        pass                                    # e.g. no stems yet: still show what's there
+    roles = []
+    for i, t in enumerate(tracks):
+        if i in stem_is:
+            roles.append("STEM")
+        elif i == ref_i:
+            roles.append("REF")
+        else:
+            roles.append(f"skip: {ignored.get(i, '')}")
+    waves = [t for t in tracks if t.get("kind") == "wave"]
+    return {"tracks": tracks, "roles": roles, "stems": len(stem_is), "has_ref": ref_i is not None,
+            "end": max((t["end"] for t in waves), default=0.0)}
+
+
+def export_mix(folder: Path, with_ref: bool = False) -> tuple[Path, Path | None]:
+    """Export the stems as ONE mix (as Audacity plays them) and optionally the REF track.
+
+    Mute/solo states are restored afterwards; nothing else in the session changes.
+    """
+    pipe = AudacityPipe()
+    folder = Path(folder)
+    folder.mkdir(parents=True, exist_ok=True)
+    try:
+        tracks = pipe.tracks()
+        ref_i, stem_is, _ = _classify(tracks, need_ref=with_ref)
+        saved = {i: (t.get("mute", 0), t.get("solo", 0)) for i, t in enumerate(tracks) if t.get("kind") == "wave"}
+        end = max(t["end"] for t in tracks if t.get("kind") == "wave")
+        try:
+            for j in saved:
+                _set_audio(pipe, j, Mute=int(j not in stem_is), Solo=0)
+            pipe.send(f"SelectTracks: Track={stem_is[0]} TrackCount=1 Mode=Set")
+            for i in stem_is[1:]:
+                pipe.send(f"SelectTracks: Track={i} TrackCount=1 Mode=Add")
+            pipe.send(f"SelectTime: Start=0 End={end:.6f} RelativeTo=ProjectStart")
+            mix = folder / "stem_mix.wav"
+            pipe.send(f"Export2: Filename={q(mix)} NumChannels=2")
+            ref = None
+            if with_ref and ref_i is not None:
+                ref = folder / "ref.wav"
+                _export_track(pipe, tracks, ref_i, end, ref)
+        finally:
+            for i, (m, s) in saved.items():
+                _set_audio(pipe, i, Mute=int(bool(m)), Solo=int(bool(s)))
+            pipe.send("SelectNone:")
+        return mix, ref
+    finally:
+        pipe.close()
+
+
 def run(opts: pipeline.Options, out_dir: Path | None = None, apply_gains: bool = False,
         preset: str | None = None, check_only: bool = False) -> int:
     try:
